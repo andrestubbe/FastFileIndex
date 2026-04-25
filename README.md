@@ -1,5 +1,7 @@
 # FastFileIndex
 
+Ultra-fast native file indexer with real-time metadata extraction and zero-copy directory traversal [ALPHA].
+
 [![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 [![Java](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.java.com)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010+-lightgrey.svg)]()
@@ -22,7 +24,7 @@
 
 ## Description
 
-FastFileIndex creates a compact, append-only, mmap-friendly binary index of all files. It is the first module in the FastJava file search engine trilogy:
+FastFileIndex is the first module in the FastJava file search engine trilogy:
 
 - **FastFileIndex** - Full filesystem scan ? produces a binary, mmap-capable index of all files
 - **FastFileSearch** - Builds Prefix Trie, N-Gram index, Exact Match map, and Ranking engine on top of the index
