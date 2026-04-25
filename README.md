@@ -6,6 +6,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![JitPack](https://jitpack.io/v/andrestubbe/FastFileIndex.svg)](https://jitpack.io/#andrestubbe/FastFileIndex)
 
+[![Demo Screenshot](docs/demo-screenshot.png)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID_HERE)
+
 ## Table of Contents
 
 - [Description](#description)
