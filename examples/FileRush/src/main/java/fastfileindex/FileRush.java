@@ -28,10 +28,10 @@ public class FileRush {
                 
                 System.out.print(String.format("%-25s %-8s %s", displayPath, sizeStr, typeStr));
                 
-                // Small delay for visual effect (every 50 files)
-                if (current % 50 == 0 && current > 0) {
+                // Delay for video recording (every 10 files)
+                if (current % 10 == 0 && current > 0) {
                     try {
-                        Thread.sleep(5);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
                         // Ignore
                     }
