@@ -53,6 +53,7 @@
                 <version>3.1.0</version>
                 <configuration>
                     <mainClass>fastfileindex.Demo</mainClass>
+                    <commandlineArgs>--enable-native-access=ALL-UNNAMED</commandlineArgs>
                 </configuration>
             </plugin>
         </plugins>
