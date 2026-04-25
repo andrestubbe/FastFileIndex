@@ -19,19 +19,16 @@ public class FileRush {
         ProgressCallback callback = new ProgressCallback() {
             @Override
             public void onProgress(long current, long total, String currentPath) {
-                // Truncate path for display
-                String displayPath = truncatePath(currentPath, 25);
+                // Truncate path for display to fit 120 chars
+                String displayPath = truncatePath(currentPath, 80);
                 
-                // Format output
-                String typeStr = "SCAN";
-                String sizeStr = String.format("%d", current);
+                // Format output - single line per file
+                System.out.println(displayPath);
                 
-                System.out.print(String.format("%-25s %-8s %s", displayPath, sizeStr, typeStr));
-                
-                // Delay for video recording (every 10 files)
-                if (current % 10 == 0 && current > 0) {
+                // Small delay for visual effect (every 50 files)
+                if (current % 50 == 0 && current > 0) {
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(5);
                     } catch (InterruptedException e) {
                         // Ignore
                     }
