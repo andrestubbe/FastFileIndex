@@ -22,10 +22,10 @@ public class FileRush {
             
             @Override
             public void onProgress(long current, long total, String currentPath) {
-                // Truncate path to fit console width (100 chars) to avoid word wrap
+                // Truncate path to fit console width (120 chars) to avoid word wrap
                 String displayPath = currentPath;
-                if (currentPath != null && currentPath.length() > 100) {
-                    displayPath = "..." + currentPath.substring(currentPath.length() - 97);
+                if (currentPath != null && currentPath.length() > 120) {
+                    displayPath = "..." + currentPath.substring(currentPath.length() - 117);
                 }
                 System.out.println(displayPath);
                 System.out.flush();
