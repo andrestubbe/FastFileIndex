@@ -10,6 +10,13 @@ import fastfileindex.ProgressCallback;
 public class FileRush {
     public static void main(String[] args) {
         System.out.println("=== FileRush ===");
+        System.out.println("Ready to scan C: drive in real-time");
+        System.out.println("Press ENTER to start...");
+        try {
+            System.in.read();
+        } catch (Exception e) {
+            // Ignore
+        }
         System.out.println("Starting real-time file scan...");
         System.out.println();
         
