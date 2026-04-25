@@ -37,6 +37,12 @@
                     <include>**/*.dll</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>build</directory>
+                <includes>
+                    <include>**/*.dll</include>
+                </includes>
+            </resource>
         </resources>
         <plugins>
             <plugin>
