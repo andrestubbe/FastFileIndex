@@ -80,12 +80,6 @@ public class Demo {
         System.out.println("=== Results ===");
         System.out.println("Indexed files: " + count);
         
-        if (count > 0) {
-            System.out.println("First file: " + FastFileIndex.getEntryPath(0));
-            System.out.println("Size: " + FastFileIndex.getEntrySize(0) + " bytes");
-            System.out.println("Type: " + FastFileIndex.getEntryType(0));
-        }
-        
         System.out.println();
         System.out.println("=== Demo Complete ===");
     }
