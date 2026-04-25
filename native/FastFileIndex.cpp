@@ -207,13 +207,14 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_buildWithProgress(
                 e.modified = toUnixTS(p.last_write_time());
                 e.type = detectType(e.path);
 
-                g_entries.push_back(std::move(e));
-                currentFile++;
-
                 // Call progress callback for every file (for FileRush real-time display)
+                // Must do this BEFORE moving e to g_entries, otherwise path becomes empty
                 jstring jpath = env->NewStringUTF(e.path.c_str());
                 env->CallVoidMethod(jcallback, onProgressMethod, (jlong)currentFile, (jlong)totalFiles, jpath);
                 env->DeleteLocalRef(jpath);
+
+                g_entries.push_back(std::move(e));
+                currentFile++;
             }
         } catch (const exception& ex) {
             // Skip directories we can't access
