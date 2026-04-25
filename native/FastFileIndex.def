@@ -1,0 +1,10 @@
+LIBRARY fastfileindex
+EXPORTS
+    Java_fastfileindex_FastFileIndex_build
+    Java_fastfileindex_FastFileIndex_save
+    Java_fastfileindex_FastFileIndex_load
+    Java_fastfileindex_FastFileIndex_getEntryCount
+    Java_fastfileindex_FastFileIndex_getEntryPath
+    Java_fastfileindex_FastFileIndex_getEntrySize
+    Java_fastfileindex_FastFileIndex_getEntryModified
+    Java_fastfileindex_FastFileIndex_getEntryType
