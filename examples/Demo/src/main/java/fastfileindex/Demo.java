@@ -4,77 +4,85 @@ import fastfileindex.FastFileIndex;
 import fastfileindex.ProgressCallback;
 
 /**
- * Demo class for testing FastFileIndex functionality.
- * This class demonstrates usage and validates the implementation.
+ * Demo - Visual demo showing all indexed files rapidly.
+ * Demonstrates the speed and volume of the index by displaying files in a "rush" effect.
  */
 public class Demo {
     public static void main(String[] args) {
         System.out.println("=== FastFileIndex Demo ===");
+        System.out.println("Ready to scan C: drive in real-time");
+        System.out.println("Press ENTER to start...");
+        try {
+            System.in.read();
+        } catch (Exception e) {
+            // Ignore
+        }
+        System.out.println("Starting real-time file scan...");
         System.out.println();
         
-        // Test with visual progress bar
+        // Scan entire C: drive
         String[] roots = { "C:\\" };
         
         ProgressCallback callback = new ProgressCallback() {
-            private long lastUpdate = 0;
+            private long fileCount = 0;
+            private long totalSize = 0;
             
             @Override
             public void onProgress(long current, long total, String currentPath) {
-                long now = System.currentTimeMillis();
-                // Update display every 100ms to avoid flickering
-                if (now - lastUpdate < 100 && current < total) {
-                    return;
+                // Truncate path to fit console width (120 chars) to avoid word wrap
+                String displayPath = currentPath;
+                if (currentPath != null && currentPath.length() > 120) {
+                    displayPath = currentPath.substring(0, 120);
                 }
-                lastUpdate = now;
+                System.out.println(displayPath);
+                System.out.flush();
                 
-                // Calculate percentage
-                double percentage = total > 0 ? (current * 100.0 / total) : 0;
+                fileCount = current;
                 
-                // Build progress bar
-                int barWidth = 40;
-                int filled = (int)(barWidth * percentage / 100);
-                StringBuilder bar = new StringBuilder("[");
-                for (int i = 0; i < barWidth; i++) {
-                    if (i < filled) {
-                        bar.append("█");
-                    } else if (i == filled) {
-                        bar.append(">");
-                    } else {
-                        bar.append(" ");
+                // Small delay for visual effect (every 50 files)
+                if (current % 50 == 0 && current > 0) {
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException e) {
+                        // Ignore
                     }
                 }
-                bar.append("]");
-                
-                // Clear line and print progress
-                System.out.print("\r" + bar + " " + String.format("%.1f", percentage) + "% (" + current + "/" + total + ") files");
             }
             
-            private String truncatePath(String path, int maxLength) {
-                if (path == null || path.length() <= maxLength) {
-                    return path;
-                }
-                return "..." + path.substring(path.length() - maxLength + 3);
+            public long getFileCount() {
+                return fileCount;
+            }
+            
+            public long getTotalSize() {
+                return totalSize;
             }
         };
         
-        System.out.println("Starting index build...");
         FastFileIndex.buildWithProgress(roots, callback);
-        System.out.println();
-        System.out.println();
         
-        String indexPath = "test-index.idx";
-        System.out.println("Saving index to: " + indexPath);
-        FastFileIndex.save(indexPath);
-        
-        System.out.println("Loading index from: " + indexPath);
-        FastFileIndex.load(indexPath);
-        
+        // Calculate total size from the index
+        long totalSize = 0;
         long count = FastFileIndex.getEntryCount();
-        System.out.println();
-        System.out.println("=== Results ===");
-        System.out.println("Indexed files: " + count);
+        for (long i = 0; i < count; i++) {
+            totalSize += FastFileIndex.getEntrySize(i);
+        }
         
+        System.out.println();
         System.out.println();
         System.out.println("=== Demo Complete ===");
+        System.out.println("Total files scanned: " + count);
+        System.out.println("Total size: " + formatSize(totalSize));
+    }
+    
+    private static String formatSize(long bytes) {
+        if (bytes < 1024) {
+            return bytes + " B";
+        } else if (bytes < 1024 * 1024) {
+            return String.format("%.1f KB", bytes / 1024.0);
+        } else if (bytes < 1024 * 1024 * 1024) {
+            return String.format("%.1f MB", bytes / (1024.0 * 1024.0));
+        } else {
+            return String.format("%.1f GB", bytes / (1024.0 * 1024.0 * 1024.0));
+        }
     }
 }
