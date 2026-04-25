@@ -25,6 +25,7 @@ public class FileRush {
                 } else {
                     System.out.println("File #" + current + " (null or empty path)");
                 }
+                System.out.flush();
                 
                 // Small delay for visual effect (every 50 files)
                 if (current % 50 == 0 && current > 0) {
