@@ -181,18 +181,7 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_buildWithProgress(
     jclass callbackClass = env->GetObjectClass(jcallback);
     jmethodID onProgressMethod = env->GetMethodID(callbackClass, "onProgress", "(JJLjava/lang/String;)V");
 
-    long totalFiles = 0;
-    // First pass: count total files for progress estimation
-    for (auto& root : roots) {
-        try {
-            for (auto& p : filesystem::recursive_directory_iterator(root, filesystem::directory_options::skip_permission_denied)) {
-                if (p.is_regular_file()) totalFiles++;
-            }
-        } catch (const exception& ex) {
-            // Skip directories we can't access
-        }
-    }
-
+    long totalFiles = 0; // Unknown, will be 0
     long currentFile = 0;
     for (auto& root : roots) {
         try {
