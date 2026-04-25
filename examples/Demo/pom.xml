@@ -27,6 +27,12 @@
                     <additionalClasspathElements>
                         <additionalClasspathElement>../../build</additionalClasspathElement>
                     </additionalClasspathElements>
+                    <systemProperties>
+                        <systemProperty>
+                            <key>java.library.path</key>
+                            <value>../../build</value>
+                        </systemProperty>
+                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>
