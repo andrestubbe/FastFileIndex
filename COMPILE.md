@@ -1,50 +1,53 @@
-# Compile Guide
+# Building FastFileIndex from Source
 
-## Requirements
+## Prerequisites
 
-- Java JDK 17+
-- Visual Studio Build Tools (for C++ compilation)
-- Maven 3.6+
+- **JDK 17+** — [Download](https://adoptium.net/)
+- **Maven 3.9+** — [Download](https://maven.apache.org/download.cgi)
+- **Visual Studio 2022** — Community/Professional/Enterprise/BuildTools
 
-## Native Compilation
-
-### Windows
+## Quick Build
 
 ```bash
+# Build native DLL first
 compile.bat
+
+# Build JAR
+mvn clean package -DskipTests
 ```
 
-This script:
-1. Loads Visual Studio Build Tools environment
-2. Compiles C++ source to DLL
-3. Copies DLL to resources directory
+## Build Commands
 
-### Manual Compilation
+| Command | Purpose |
+|---------|---------|
+| `compile.bat` | Build native DLL (Windows) |
+| `mvn clean compile` | Compile Java only |
+| `mvn clean package` | Build JAR with DLL |
+| `mvn clean package -DskipTests` | Fast build |
 
-```bash
-call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
-cl.exe /LD /Fe:build\fastfileindex.dll native\FastFileIndex.cpp /I"C:\Program Files\Java\jdk-25\include" /I"C:\Program Files\Java\jdk-25\include\win32" /std:c++17 /DEF:native\FastFileIndex.def
-copy build\fastfileindex.dll src\main\resources\native\
-```
+## Native DLL Build
 
-## Maven Build
+The `compile.bat` script:
+- Auto-detects Visual Studio 2022
+- Auto-detects JAVA_HOME
+- Uses `native\FastFileIndex.def` for JNI exports
+- Outputs to `build\fastfileindex.dll`
 
-```bash
-mvn clean package
-```
+## Running Examples
 
-This creates:
-- `target/fastfileindex-v1.0.0.jar` - Standard JAR
-- `target/fastfileindex-v1.0.0-jar-with-dependencies.jar` - FatJAR with all dependencies and native DLL
-
-## Running
-
-```bash
-java -jar target/fastfileindex-v1.0.0-jar-with-dependencies.jar
-```
-
-**Note:** When running the demo, ensure you are in the `build` directory for DLL loading:
 ```bash
 cd build
+javac -cp ..\target\fastfileindex-v1.0.0-jar-with-dependencies.jar ..\examples\Demo\src\main\java\fastfileindex\Demo.java -d ..\examples\Demo\src\main\java
 java -cp ..\target\fastfileindex-v1.0.0-jar-with-dependencies.jar;..\examples\Demo\src\main\java fastfileindex.Demo
 ```
+
+## Troubleshooting
+
+**"Cannot find DLL"** — Run `compile.bat` first
+
+**"UnsatisfiedLinkError"** — Check:
+1. DLL built successfully (`build\fastfileindex.dll` exists)
+2. DLL included in JAR (check `pom.xml` resources)
+3. JNI exports defined in `native\FastFileIndex.def`
+
+**"Java version mismatch"** — Ensure JDK 17+ and JAVA_HOME set

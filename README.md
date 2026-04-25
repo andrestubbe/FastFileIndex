@@ -120,44 +120,7 @@ version>'
 
 ## Building from Source
 
-### Requirements
-
-- Java JDK 17+
-- Visual Studio Build Tools (for C++ compilation on Windows)
-- Maven 3.6+
-
-### Native Compilation
-
-```bash
-compile.bat
-```
-
-This script:
-1. Loads Visual Studio Build Tools environment
-2. Compiles C++ source to DLL
-3. Copies DLL to resources directory
-
-### Maven Build
-
-```bash
-mvn clean package
-```
-
-This creates:
-- `target/fastfileindex-v1.0.0.jar` - Standard JAR
-- `target/fastfileindex-v1.0.0-jar-with-dependencies.jar` - FatJAR with all dependencies and native DLL
-
-### Running
-
-```bash
-java -jar target/fastfileindex-v1.0.0-jar-with-dependencies.jar
-```
-
-**Note:** When running the demo, ensure you are in the `build` directory for DLL loading:
-```bash
-cd build
-java -cp ..\target\fastfileindex-v1.0.0-jar-with-dependencies.jar;..\examples\Demo\src\main\java fastfileindex.Demo
-```
+For detailed build instructions, see [COMPILE.md](COMPILE.md).
 
 ## Platform Support
 
