@@ -10,12 +10,13 @@ import fastfileindex.ProgressCallback;
 public class Demo {
     public static void main(String[] args) {
         System.out.println("=== FastFileIndex Demo ===");
+        System.out.println("Debug: Demo started");
         System.out.println("Ready to scan C: drive in real-time");
         System.out.println("Press ENTER to start...");
         try {
             System.in.read();
         } catch (Exception e) {
-            // Ignore
+            System.out.println("Debug: Exception reading input: " + e.getMessage());
         }
         System.out.println("Starting real-time file scan...");
         System.out.println();
