@@ -78,9 +78,7 @@ The index consists of two files:
 
 ## Installation
 
-### Maven
-
-Add JitPack repository to your `pom.xml`:
+### Maven (JitPack)
 
 ```xml
 <repositories>
@@ -89,33 +87,32 @@ Add JitPack repository to your `pom.xml`:
         <url>https://jitpack.io</url>
     </repository>
 </repositories>
-```
 
-Add dependency:
-
-```xml
 <dependency>
     <groupId>com.github.andrestubbe</groupId>
     <artifactId>fastfileindex</artifactId>
     <version>v1.0.0</version>
 </dependency>
+<dependency>
+    <groupId>com.github.andrestubbe</groupId>
+    <artifactId>fastcore</artifactId>
+    <version>v1.0.0</version>
+</dependency>
 ```
 
-### Gradle
+> **Note:** FastCore handles native library loading from the JAR automatically. Both dependencies are required.
 
-Add JitPack repository:
+### Gradle (JitPack)
 
 ```groovy
 repositories {
     maven { url 'https://jitpack.io' }
 }
-```
 
-Add dependency:
-
-```groovy
-implementation 'com.github.andrestubbe:fastfileindex:v1.0.0'
-version>'
+dependencies {
+    implementation 'com.github.andrestubbe:fastfileindex:v1.0.0'
+    implementation 'com.github.andrestubbe:fastcore:v1.0.0'
+}
 ```
 
 ## Building from Source
