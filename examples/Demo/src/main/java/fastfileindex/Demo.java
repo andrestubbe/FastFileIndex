@@ -13,7 +13,7 @@ public class Demo {
         System.out.println();
         
         // Test with visual progress bar
-        String[] roots = { "C:\\Users\\andre\\Documents" };
+        String[] roots = { "C:\\" };
         
         ProgressCallback callback = new ProgressCallback() {
             private long lastUpdate = 0;
@@ -47,12 +47,6 @@ public class Demo {
                 
                 // Clear line and print progress
                 System.out.print("\r" + bar + " " + String.format("%.1f", percentage) + "% (" + current + "/" + total + ") files");
-                
-                // Print current path on new line occasionally
-                if (current % 500 == 0 || current == total) {
-                    System.out.println();
-                    System.out.println("  Scanning: " + truncatePath(currentPath, 60));
-                }
             }
             
             private String truncatePath(String path, int maxLength) {
