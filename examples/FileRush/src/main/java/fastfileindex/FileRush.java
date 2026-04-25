@@ -25,7 +25,7 @@ public class FileRush {
                 // Truncate path to fit console width (120 chars) to avoid word wrap
                 String displayPath = currentPath;
                 if (currentPath != null && currentPath.length() > 120) {
-                    displayPath = "..." + currentPath.substring(currentPath.length() - 117);
+                    displayPath = currentPath.substring(0, 120);
                 }
                 System.out.println(displayPath);
                 System.out.flush();
