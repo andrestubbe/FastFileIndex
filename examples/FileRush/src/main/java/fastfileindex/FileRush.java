@@ -20,11 +20,7 @@ public class FileRush {
             @Override
             public void onProgress(long current, long total, String currentPath) {
                 // Display full path - no truncation
-                if (currentPath != null && !currentPath.isEmpty()) {
-                    System.out.println(currentPath);
-                } else {
-                    System.out.println("File #" + current + " (null or empty path)");
-                }
+                System.out.println(currentPath);
                 System.out.flush();
                 
                 // Small delay for visual effect (every 50 files)
