@@ -4,23 +4,29 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
-    <parent>
-        <groupId>io.github.andrestubbe</groupId>
-        <artifactId>fastfileindex</artifactId>
-        <version>v1.0.0</version>
-        <relativePath>../../pom.xml</relativePath>
-    </parent>
-    
+    <groupId>io.github.andrestubbe</groupId>
     <artifactId>fastfileindex-demo</artifactId>
+    <version>v1.0.0</version>
     <packaging>jar</packaging>
+    
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     
     <dependencies>
         <dependency>
-            <groupId>io.github.andrestubbe</groupId>
+            <groupId>com.github.andrestubbe</groupId>
             <artifactId>fastfileindex</artifactId>
             <version>v1.0.0</version>
-            <systemPath>../../target/fastfileindex-v1.0.0.jar</systemPath>
-            <scope>system</scope>
         </dependency>
     </dependencies>
     
@@ -29,40 +35,10 @@
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.5.0</version>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>../../src/main/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
                     <mainClass>fastfileindex.Demo</mainClass>
-                    <classpathScope>compile</classpathScope>
-                    <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                    <additionalClasspathElements>
-                        <additionalClasspathElement>../../build</additionalClasspathElement>
-                    </additionalClasspathElements>
-                    <systemProperties>
-                        <systemProperty>
-                            <key>java.library.path</key>
-                            <value>../../build</value>
-                        </systemProperty>
-                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>
