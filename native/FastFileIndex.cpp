@@ -150,6 +150,82 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_build(
 }
 
 /**
+ * @brief Build file index with progress callback
+ * 
+ * @param env JNI environment pointer
+ * @param clazz Java class object
+ * @param jroots Array of root directory paths
+ * @param jcallback Progress callback object
+ */
+JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_buildWithProgress(
+    JNIEnv* env,
+    jclass clazz,
+    jobjectArray jroots,
+    jobject jcallback) {
+
+    lock_guard<mutex> lock(g_entriesMutex);
+    g_entries.clear();
+    g_entries.reserve(500000);
+
+    jsize rootCount = env->GetArrayLength(jroots);
+    vector<string> roots;
+
+    for (jsize i = 0; i < rootCount; i++) {
+        jstring jroot = (jstring)env->GetObjectArrayElement(jroots, i);
+        const char* root = env->GetStringUTFChars(jroot, nullptr);
+        roots.push_back(string(root));
+        env->ReleaseStringUTFChars(jroot, root);
+    }
+
+    // Get callback class and method
+    jclass callbackClass = env->GetObjectClass(jcallback);
+    jmethodID onProgressMethod = env->GetMethodID(callbackClass, "onProgress", "(JJLjava/lang/String;)V");
+
+    long totalFiles = 0;
+    // First pass: count total files for progress estimation
+    for (auto& root : roots) {
+        try {
+            for (auto& p : filesystem::recursive_directory_iterator(root, filesystem::directory_options::skip_permission_denied)) {
+                if (p.is_regular_file()) totalFiles++;
+            }
+        } catch (const exception& ex) {
+            // Skip directories we can't access
+        }
+    }
+
+    long currentFile = 0;
+    for (auto& root : roots) {
+        try {
+            for (auto& p : filesystem::recursive_directory_iterator(root, filesystem::directory_options::skip_permission_denied)) {
+                if (!p.is_regular_file()) continue;
+
+                FileEntry e;
+                e.path = p.path().string();
+                e.id = hash64(e.path);
+                e.parentId = hash64(p.path().parent_path().string());
+                e.size = p.file_size();
+                e.modified = toUnixTS(p.last_write_time());
+                e.type = detectType(e.path);
+
+                g_entries.push_back(std::move(e));
+                currentFile++;
+
+                // Call progress callback every 100 files
+                if (currentFile % 100 == 0 || currentFile == totalFiles) {
+                    jstring jpath = env->NewStringUTF(e.path.c_str());
+                    env->CallVoidMethod(jcallback, onProgressMethod, (jlong)currentFile, (jlong)totalFiles, jpath);
+                    env->DeleteLocalRef(jpath);
+                }
+            }
+        } catch (const exception& ex) {
+            // Skip directories we can't access
+        }
+    }
+
+    env->DeleteLocalRef(callbackClass);
+}
+
+/**
  * @brief Save index to binary file
  * 
  * @param env JNI environment pointer
@@ -298,7 +374,6 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_load(
         }
 
         g_entries.push_back(std::move(e));
-        offset += h->pathLen;
     }
 
     env->ReleaseStringUTFChars(jindexPath, indexPath);

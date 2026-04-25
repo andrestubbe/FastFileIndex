@@ -17,7 +17,7 @@ package fastfileindex;
  *   <li>mmap-based loading (CreateFileMapping + MapViewOfFile)</li>
  *   <li>Path-Blob + Offsets instead of std::string per entry</li>
  *   <li>Parallel build with threadpool and lock-free append buffer</li>
- *   <li>FNV-1a hashing for stable IDs</li>
+ *   <li>FNV-1a hashing for stable file IDs</li>
  *   <li>Type detection (image, pdf, text, code)</li>
  *   <li>Converts file timestamps to Unix seconds</li>
  *   <li>Saves to files.idx (append-only)</li>
@@ -57,6 +57,13 @@ public class FastFileIndex {
      * @param roots Array of root directory paths to scan
      */
     public static native void build(String[] roots);
+    
+    /**
+     * Builds the file index with progress callback.
+     * @param roots Array of root directory paths to scan
+     * @param callback Progress callback interface
+     */
+    public static native void buildWithProgress(String[] roots, ProgressCallback callback);
     
     /**
      * Saves the built index to a binary file.
