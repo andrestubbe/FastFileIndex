@@ -1,4 +1,4 @@
-# FastFileIndex - Ultra-fast native file indexer with real-time metadata extraction and zero-copy directory traversal [ALPHA].
+# FastFileIndex - Native real-time file indexer with zero-copy traversal [ALPHA].
 
 
 
