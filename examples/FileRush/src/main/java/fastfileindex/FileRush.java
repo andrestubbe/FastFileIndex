@@ -19,11 +19,8 @@ public class FileRush {
         ProgressCallback callback = new ProgressCallback() {
             @Override
             public void onProgress(long current, long total, String currentPath) {
-                // Truncate path for display to fit 120 chars
-                String displayPath = truncatePath(currentPath, 80);
-                
-                // Format output - single line per file
-                System.out.println(displayPath);
+                // Display full path - no truncation
+                System.out.println(currentPath);
                 
                 // Small delay for visual effect (every 50 files)
                 if (current % 50 == 0 && current > 0) {
