@@ -36,7 +36,7 @@ public class Demo {
                 StringBuilder bar = new StringBuilder("[");
                 for (int i = 0; i < barWidth; i++) {
                     if (i < filled) {
-                        bar.append("=");
+                        bar.append("█");
                     } else if (i == filled) {
                         bar.append(">");
                     } else {
