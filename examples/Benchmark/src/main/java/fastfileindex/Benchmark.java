@@ -39,20 +39,15 @@ public class Benchmark {
         if (!warmup) System.out.print("FastFileIndex: ");
         
         long start = System.currentTimeMillis();
-        AtomicLong count = new AtomicLong(0);
         
-        FastFileIndex.buildWithProgress(new String[]{path}, new ProgressCallback() {
-            @Override
-            public void onProgress(String currentFile, long totalFiles, long currentPath) {
-                count.incrementAndGet();
-            }
-        });
+        FastFileIndex.build(new String[]{path});
         
         long end = System.currentTimeMillis();
         long elapsed = end - start;
         
         if (!warmup) {
-            System.out.println(elapsed + " ms (" + count.get() + " files)");
+            long count = FastFileIndex.getEntryCount();
+            System.out.println(elapsed + " ms (" + count + " files)");
         }
         
         return elapsed;
@@ -65,9 +60,20 @@ public class Benchmark {
         AtomicLong count = new AtomicLong(0);
         
         try {
-            Files.walk(Paths.get(path))
-                .filter(Files::isRegularFile)
-                .forEach(file -> count.incrementAndGet());
+            Files.walkFileTree(Paths.get(path), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    if (attrs.isRegularFile()) {
+                        count.incrementAndGet();
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+                
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                    return FileVisitResult.CONTINUE;
+                }
+            });
         } catch (IOException e) {
             System.err.println("Error: " + e.getMessage());
         }
