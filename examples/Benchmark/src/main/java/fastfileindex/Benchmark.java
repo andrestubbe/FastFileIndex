@@ -32,6 +32,18 @@ public class Benchmark {
         if (javaTime > 0) {
             double speedup = (double) javaTime / fastTime;
             System.out.printf("Speedup: %.2fx faster%n", speedup);
+            
+            // Bar visualization
+            int barLength = Math.min((int) speedup, 50);
+            System.out.print("[");
+            for (int i = 0; i < 50; i++) {
+                if (i < barLength) {
+                    System.out.print("█");
+                } else {
+                    System.out.print(" ");
+                }
+            }
+            System.out.println("] " + String.format("%.2fx", speedup));
         }
     }
     
