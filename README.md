@@ -2,12 +2,6 @@
 
 **Scan and search millions of files in milliseconds with zero latency.**
 
-[![Build](https://img.shields.io/github/actions/workflow/status/andrestubbe/FastFileIndex/maven.yml?branch=main)](https://github.com/andrestubbe/FastFileIndex/actions)
-[![Java](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.java.com)
-[![Platform](https://img.shields.io/badge/Platform-Windows%2010+-lightgrey.svg)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![JitPack](https://jitpack.io/v/andrestubbe/FastFileIndex.svg)](https://jitpack.io/#andrestubbe/FastFileIndex)
-
 FastFileIndex is the high-performance file indexing engine for the FastJava ecosystem. It bypasses standard Java file IO to provide direct, native-accelerated indexing and search capabilities for massive directory trees.
 
 ```java
@@ -24,6 +18,12 @@ public class Demo {
     }
 }
 ```
+
+[![Status](https://img.shields.io/badge/status-v0.1.0-brightgreen.svg)](https://github.com/andrestubbe/FastFileIndex/releases/tag/v0.1.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.java.com)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010+-lightgrey.svg)]()
+[![JitPack](https://img.shields.io/badge/JitPack-ready-green.svg)](https://jitpack.io/#andrestubbe)
 
 ---
 
