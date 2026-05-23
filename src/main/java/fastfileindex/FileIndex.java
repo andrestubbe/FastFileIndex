@@ -37,18 +37,10 @@ package fastfileindex;
 public final class FileIndex {
     static {
         try {
-            // Try System.loadLibrary first (default)
-            System.loadLibrary("fastcore");
-        } catch (UnsatisfiedLinkError e1) {
-            try {
-                // Fallback to absolute path (relative to user.dir)
-                String userDir = System.getProperty("user.dir");
-                String dllPath = userDir + "\\build\\fastcore.dll";
-                System.load(dllPath);
-            } catch (UnsatisfiedLinkError e2) {
-                System.err.println("Failed to load fastcore.dll: " + e2.getMessage());
-                throw e2;
-            }
+            fastcore.FastCore.loadLibrary("fastfileindex");
+        } catch (Throwable e) {
+            System.err.println("CRITICAL: FastCore failed to load native DLL: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
@@ -70,7 +62,10 @@ public final class FileIndex {
     /**
      * Open existing index from file.
      */
-    public static native FileIndex open(String indexPath);
+    public static FileIndex open(String indexPath) {
+        FastFileIndex.load(indexPath);
+        return new FileIndex(0xABCDEF);
+    }
 
     /**
      * Save index to file.
@@ -90,7 +85,9 @@ public final class FileIndex {
     /**
      * Get entry count.
      */
-    public native long entryCount();
+    public long entryCount() {
+        return FastFileIndex.getEntryCount();
+    }
 
     /**
      * Get file entry by ID.
@@ -98,8 +95,6 @@ public final class FileIndex {
     public native FileEntry get(long id);
 
     public static void main(String[] args) {
-        System.out.println("=== FileIndex ===");
-        System.out.println("FileIndex - Binary file indexing with mmap support");
-        System.out.println("=== OK ===");
+        // Entry point for testing
     }
 }

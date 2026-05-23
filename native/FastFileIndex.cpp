@@ -97,6 +97,7 @@ static uint64_t toUnixTS(const filesystem::file_time_type& ft) {
 }
 
 // ============================================================================
+// ============================================================================
 // JNI Implementation
 // ============================================================================
 
@@ -104,10 +105,6 @@ extern "C" {
 
 /**
  * @brief Build file index by scanning root directories
- * 
- * @param env JNI environment pointer
- * @param clazz Java class object
- * @param jroots Array of root directory paths
  */
 JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_build(
     JNIEnv* env,
@@ -271,100 +268,52 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_save(
     env->ReleaseStringUTFChars(jindexPath, indexPath);
 }
 
-/**
- * @brief Load index from binary file using memory-mapped I/O
- * 
- * @param env JNI environment pointer
- * @param clazz Java class object
- * @param jindexPath Path to the index file
- */
-JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_load(
-    JNIEnv* env,
-    jclass clazz,
-    jstring jindexPath) {
-
+JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_load(JNIEnv* env, jclass clazz, jstring jindexPath) {
     lock_guard<mutex> lock(g_entriesMutex);
-
+    
     // Clean up previous mapping
-    if (g_mappedData) {
-        UnmapViewOfFile(g_mappedData);
-        g_mappedData = nullptr;
-    }
-    if (g_hMap) {
-        CloseHandle(g_hMap);
-        g_hMap = nullptr;
-    }
-    if (g_hFile) {
-        CloseHandle(g_hFile);
-        g_hFile = nullptr;
-    }
-
+    if (g_mappedData) { UnmapViewOfFile(g_mappedData); g_mappedData = nullptr; }
+    if (g_hMap) { CloseHandle(g_hMap); g_hMap = nullptr; }
+    if (g_hFile) { CloseHandle(g_hFile); g_hFile = nullptr; }
     g_entries.clear();
 
     const char* indexPath = env->GetStringUTFChars(jindexPath, nullptr);
+    if (!indexPath) return;
     string indexPathStr(indexPath);
+    env->ReleaseStringUTFChars(jindexPath, indexPath);
 
-    // Load paths blob
+    // 1. Load paths
     string pathsPath = indexPathStr + ".paths";
     ifstream pathsIn(pathsPath, ios::binary | ios::ate);
-    if (!pathsIn.is_open()) {
-        env->ReleaseStringUTFChars(jindexPath, indexPath);
-        return;
-    }
+    if (!pathsIn.is_open()) return;
     size_t pathsSize = pathsIn.tellg();
     pathsIn.seekg(0, ios::beg);
     vector<char> pathsBlob(pathsSize);
     pathsIn.read(pathsBlob.data(), pathsSize);
     pathsIn.close();
 
-    // mmap the index file
+    // 2. Map index
     g_hFile = CreateFileA(indexPathStr.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (g_hFile == INVALID_HANDLE_VALUE) {
-        env->ReleaseStringUTFChars(jindexPath, indexPath);
-        return;
-    }
-
+    if (g_hFile == INVALID_HANDLE_VALUE) return;
     DWORD fileSize = GetFileSize(g_hFile, NULL);
     g_fileSize = fileSize;
     g_hMap = CreateFileMappingA(g_hFile, NULL, PAGE_READONLY, 0, fileSize, NULL);
-    if (!g_hMap) {
-        CloseHandle(g_hFile);
-        g_hFile = nullptr;
-        env->ReleaseStringUTFChars(jindexPath, indexPath);
-        return;
-    }
-
+    if (!g_hMap) { CloseHandle(g_hFile); g_hFile = nullptr; return; }
     g_mappedData = (char*)MapViewOfFile(g_hMap, FILE_MAP_READ, 0, 0, fileSize);
-    if (!g_mappedData) {
-        CloseHandle(g_hMap);
-        CloseHandle(g_hFile);
-        g_hMap = nullptr;
-        g_hFile = nullptr;
-        env->ReleaseStringUTFChars(jindexPath, indexPath);
-        return;
-    }
+    if (!g_mappedData) { CloseHandle(g_hMap); CloseHandle(g_hFile); g_hMap = nullptr; g_hFile = nullptr; return; }
 
-    // Parse entries from mmap
+    // 3. Parse
     size_t offset = 0;
     while (offset < fileSize) {
         FileEntryHeader* h = (FileEntryHeader*)(g_mappedData + offset);
         offset += sizeof(FileEntryHeader);
-
         FileEntry e;
-        e.id = h->id;
-        e.parentId = h->parentId;
-        e.size = h->size;
-        e.modified = h->modified;
-        e.type = h->type;
-
+        e.id = h->id; e.parentId = h->parentId; e.size = h->size; e.modified = h->modified; e.type = h->type;
         if (h->pathOffset + h->pathLen <= pathsBlob.size()) {
             e.path = string(pathsBlob.data() + h->pathOffset, h->pathLen);
         }
-
         g_entries.push_back(std::move(e));
     }
-
-    env->ReleaseStringUTFChars(jindexPath, indexPath);
 }
 
 /**
@@ -463,15 +412,39 @@ JNIEXPORT jint JNICALL Java_fastfileindex_FastFileIndex_getEntryType(
 }
 
 /**
+ * @brief JNI Implementation for fastfileindex.FileIndex (Object-Oriented)
+ */
+JNIEXPORT jobject JNICALL Java_fastfileindex_FileIndex_open__Ljava_lang_String_2(JNIEnv* env, jclass clazz, jstring indexPath) {
+    // 1. Load the index using the static logic
+    Java_fastfileindex_FastFileIndex_load(env, clazz, indexPath);
+    
+    // 2. Create new FileIndex instance
+    jmethodID constructor = env->GetMethodID(clazz, "<init>", "(J)V");
+    if (constructor == NULL) return NULL;
+    return env->NewObject(clazz, constructor, (jlong)0xABCDEF);
+}
+
+JNIEXPORT jlong JNICALL Java_fastfileindex_FileIndex_entryCount(JNIEnv* env, jobject obj) {
+    return Java_fastfileindex_FastFileIndex_getEntryCount(env, NULL);
+}
+
+JNIEXPORT void JNICALL Java_fastfileindex_FileIndex_close(JNIEnv* env, jobject obj) {
+    // Cleanup global state
+    lock_guard<mutex> lock(g_entriesMutex);
+    if (g_mappedData) UnmapViewOfFile(g_mappedData);
+    if (g_hMap) CloseHandle(g_hMap);
+    if (g_hFile) CloseHandle(g_hFile);
+    g_mappedData = nullptr;
+    g_hMap = nullptr;
+    g_hFile = nullptr;
+    g_entries.clear();
+}
+
+} // extern "C"
+
+/**
  * @brief DLL entry point
- * 
- * @param hModule DLL module handle
- * @param reason Reason for calling entry point
- * @param lpReserved Reserved parameter
- * @return TRUE on success
  */
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved) {
     return TRUE;
 }
-
-} // extern "C"

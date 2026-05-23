@@ -5,13 +5,10 @@ import java.io.File;
 public class FastFileIndex {
     static {
         try {
-            // FORCE absolute path to the newly compiled DLL to avoid outdated cached versions
-            String exactDllPath = "C:\\Users\\andre\\Documents\\2026-04-28-Work-FastJava\\FastFileIndex\\build\\fastfileindex.dll";
-            System.out.println("DEBUG: Forcing JNI load from: " + exactDllPath);
-            System.load(exactDllPath);
-            System.out.println("DEBUG: JNI DLL loaded successfully!");
+            // Use FastCore to handle extraction and loading of the JNI DLL securely
+            fastcore.FastCore.loadLibrary("fastfileindex");
         } catch (Throwable e) {
-            System.err.println("CRITICAL: Failed to load JNI DLL: " + e.getMessage());
+            System.err.println("CRITICAL: FastCore failed to load native DLL: " + e.getMessage());
             e.printStackTrace();
         }
     }
