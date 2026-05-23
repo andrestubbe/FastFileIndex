@@ -1,4 +1,4 @@
-# FastFileIndex — Ultra-Fast Native File Indexing for Java
+﻿# FastFileIndex â€” Ultra-Fast Native File Indexing for Java
 
 **Scan and search millions of files in milliseconds with zero latency.**
 
@@ -11,7 +11,7 @@
 FastFileIndex is the high-performance file indexing engine for the FastJava ecosystem. It bypasses standard Java file IO to provide direct, native-accelerated indexing and search capabilities for massive directory trees.
 
 ```java
-// Quick Start — Indexing a directory
+// Quick Start â€” Indexing a directory
 import fastfileindex.FastFileIndex;
 
 public class Demo {
@@ -42,9 +42,9 @@ public class Demo {
 
 ## Key Features
 
-- **🚀 Instant Indexing** — Scan millions of files in milliseconds using native C++ pipelines.
-- **⚡ Zero Latency** — Real-time results for massive file systems.
-- **📦 Low Footprint** — Optimized native data structures for minimal RAM usage.
+- **ðŸš€ Instant Indexing** â€” Scan millions of files in milliseconds using native C++ pipelines.
+- **âš¡ Zero Latency** â€” Real-time results for massive file systems.
+- **ðŸ“¦ Low Footprint** â€” Optimized native data structures for minimal RAM usage.
 
 ---
 
@@ -63,7 +63,7 @@ FastFileIndex out-performs standard Java NIO indexing by utilizing Windows-speci
 ### Option 1: Maven (Recommended)
 Add the JitPack repository and the dependencies to your `pom.xml`:
 
-`xml
+```xml
 <repositories>
     <repository>
         <id>jitpack.io</id>
@@ -78,6 +78,7 @@ Add the JitPack repository and the dependencies to your `pom.xml`:
         <artifactId>fastfileindex</artifactId>
         <version>v0.1.0</version>
     </dependency>
+
     <!-- FastCore (Required Native Loader) -->
     <dependency>
         <groupId>com.github.andrestubbe</groupId>
@@ -85,19 +86,19 @@ Add the JitPack repository and the dependencies to your `pom.xml`:
         <version>v0.1.0</version>
     </dependency>
 </dependencies>
-`
+```
 
 ### Option 2: Gradle (via JitPack)
-`groovy
+```groovy
 repositories {
     maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    implementation 'com.github.andrestubbe:.1.0'
+    implementation 'com.github.andrestubbe:fastfileindex:v0.1.0'
     implementation 'com.github.andrestubbe:fastcore:v0.1.0'
 }
-`
+```
 
 ### Option 3: Direct Download (No Build Tool)
 Download the latest JARs directly to add them to your classpath:
@@ -122,8 +123,8 @@ Download the latest JARs directly to add them to your classpath:
 
 | Platform | Status |
 |----------|--------|
-| Windows 10/11 (x64) | ✅ Fully Supported |
-| Linux | 🚧 Planned |
+| Windows 10/11 (x64) | âœ… Fully Supported |
+| Linux | ðŸš§ Planned |
 
 ---
 
@@ -134,17 +135,17 @@ For detailed instructions on compiling the C++ JNI code, see [COMPILE.md](COMPIL
 ---
 
 ## License
-MIT License — See [LICENSE](LICENSE) file for details.
+MIT License â€” See [LICENSE](LICENSE) file for details.
 
 ---
 
 ## Related Projects
-- [FastCore](https://github.com/andrestubbe/FastCore) — Native Library Loader for Java
-- [FastFileSearch](https://github.com/andrestubbe/FastFileSearch) — Real-time fuzzy search engine
-- [FastThumb](https://github.com/andrestubbe/FastThumb) — Native Shell Image Engine
+- [FastCore](https://github.com/andrestubbe/FastCore) â€” Native Library Loader for Java
+- [FastFileSearch](https://github.com/andrestubbe/FastFileSearch) â€” Real-time fuzzy search engine
+- [FastThumb](https://github.com/andrestubbe/FastThumb) â€” Native Shell Image Engine
 
 ---
-**Made with ⚡ by Andre Stubbe**
+**Made with âš¡ by Andre Stubbe**
 
 <!-- 
 SEO Keywords: java, jni, indexing, file system, windows api, performance
