@@ -1,16 +1,9 @@
 @echo off
-echo === FileIndex Demo ===
-echo.
-echo Building FastFileIndex...
-call mvn clean package -f pom.xml
-echo.
-echo Building Demo...
+echo ⚡ Building Main Project...
+call mvn clean package -DskipTests
+if %ERRORLEVEL% NEQ 0 ( pause & exit /b )
+echo 🚀 Running Hero Demo...
 cd examples\Demo
-call mvn clean package -f pom.xml
-echo.
-echo Running Demo...
-java --enable-native-access=ALL-UNNAMED -cp "target\fastfileindex-demo-v1.0.0.jar;..\..\target\fastfileindex-v1.0.0.jar" fastfileindex.Demo
+call mvn compile exec:java -Dexec.mainClass=fastfileindex.Demo
 cd ..\..
-echo.
-echo === Demo Complete ===
 pause
