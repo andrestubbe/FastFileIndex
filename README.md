@@ -6,7 +6,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010+-lightgrey.svg)]()
 [![JitPack](https://img.shields.io/badge/JitPack-ready-green.svg)](https://jitpack.io/#andrestubbe)
 
-**Scan and search millions of files in milliseconds with zero latency.**
+**⚡ Scan and search millions of files in milliseconds with zero latency.**
 
 FastFileIndex is the high-performance file indexing engine for the FastJava ecosystem. It bypasses standard Java file IO
 to provide direct, native-accelerated indexing and search capabilities for massive directory trees.
@@ -130,18 +130,22 @@ Download the latest JARs directly to add them to your classpath:
 
 ---
 
-## Platform Support
+## Documentation
 
-| Platform            | Status            |
-|---------------------|-------------------|
-| Windows 10/11 (x64) | ✅ Fully Supported |
-| Linux               | 🚧 Planned        |
+* **[COMPILE.md](COMPILE.md)**: Full compilation guide (MSVC C++17 build chain + JNI Setup).
+* **[REFERENCE.md](REFERENCE.md)**: Full API descriptions, border configurations, and codepoint index.
+* **[PHILOSOPHIE.md](PHILOSOPHIE.md)**: The engineering rationale for zero-allocation performance.
+* **[ROADMAP.md](ROADMAP.md)**: Future milestones and planned features.
 
 ---
 
-## Building from Source
+## Platform Support
 
-For detailed instructions on compiling the C++ JNI code, see [COMPILE.md](COMPILE.md).
+| Platform      | Status            |
+|---------------|-------------------|
+| Windows 10/11 | ✅ Fully Supported |
+| Linux         | 🚧 Planned        |
+| macOS         | 🚧 Planned        |
 
 ---
 
@@ -153,13 +157,11 @@ MIT License — See [LICENSE](LICENSE) file for details.
 
 ## Related Projects
 
-- [FastCore](https://github.com/andrestubbe/FastCore) — Native Library Loader for Java
-- [FastFileSearch](https://github.com/andrestubbe/FastFileSearch) — Real-time fuzzy search engine
-- [FastThumb](https://github.com/andrestubbe/FastThumb) — Native Shell Image Engine
+- [FastFileIndex](https://github.com/andrestubbe/FastFileIndex) - Binary file indexing with mmap support
+- [FastFileSearch](https://github.com/andrestubbe/FastFileSearch) - Prefix Trie, N-Gram index, and Ranking engine
+- [FastFileWatch](https://github.com/andrestubbe/FastFileWatch) - USN Journal-based live file monitoring
+- [FastCore](https://github.com/andrestubbe/FastCore) - Unified JNI loader and platform abstraction
 
 ---
-**Made with ⚡ by Andre Stubbe**
 
-<!-- 
-SEO Keywords: java, jni, indexing, file system, windows api, performance
--->
+**Part of the FastJava Ecosystem** — *Making the JVM faster. Small package. Maximum speed. Zero bloat. 🚀📋*
