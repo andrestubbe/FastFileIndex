@@ -70,28 +70,23 @@ FastFileIndex out-performs standard Java NIO indexing by utilizing Windows-speci
 Add the JitPack repository and the dependencies to your `pom.xml`:
 
 ```xml
-
 <repositories>
     <repository>
         <id>jitpack.io</id>
         <url>https://jitpack.io</url>
     </repository>
 </repositories>
-
 <dependencies>
-<!-- FastFileIndex Library -->
-<dependency>
-    <groupId>com.github.andrestubbe</groupId>
-    <artifactId>fastfileindex</artifactId>
-    <version>v0.1.0</version>
-</dependency>
-
-<!-- FastCore (Required Native Loader) -->
-<dependency>
-    <groupId>com.github.andrestubbe</groupId>
-    <artifactId>fastcore</artifactId>
-    <version>v0.1.0</version>
-</dependency>
+   <dependency>
+       <groupId>com.github.andrestubbe</groupId>
+       <artifactId>fastfileindex</artifactId>
+       <version>v0.1.0</version>
+   </dependency>
+   <dependency>
+       <groupId>com.github.andrestubbe</groupId>
+       <artifactId>fastcore</artifactId>
+       <version>v0.1.0</version>
+   </dependency>
 </dependencies>
 ```
 
