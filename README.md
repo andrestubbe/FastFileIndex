@@ -1,4 +1,4 @@
-﻿# FastFileIndex v0.1.0 [ALPHA] — Ultra-Fast Native File Indexing for Java
+# FastFileIndex v0.1.0 [ALPHA] � Ultra-Fast Native File Indexing for Java
 
 [![Status](https://img.shields.io/badge/status-v0.1.0-brightgreen.svg)](https://github.com/andrestubbe/FastFileIndex/releases/tag/v0.1.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -6,7 +6,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010+-lightgrey.svg)]()
 [![JitPack](https://img.shields.io/badge/JitPack-ready-green.svg)](https://jitpack.io/#andrestubbe)
 
-**⚡ Scan and search millions of files in milliseconds with zero latency.**
+**? Scan and search millions of files in milliseconds with zero latency.**
 
 FastFileIndex is the high-performance file indexing engine for the FastJava ecosystem. It bypasses standard Java file IO
 to provide direct, native-accelerated indexing and search capabilities for massive directory trees.
@@ -14,7 +14,7 @@ to provide direct, native-accelerated indexing and search capabilities for massi
 [![FastFileIndex Showcase](docs/screenshot.png)](https://www.youtube.com/watch?v=BZsqQl7WqWk)
 
 ```java
-// Quick Start — Indexing a directory
+// Quick Start � Indexing a directory
 
 import fastfileindex.FastFileIndex;
 
@@ -47,9 +47,9 @@ public class Demo {
 
 ## Key Features
 
-- **🚀 Instant Indexing** — Scan millions of files in milliseconds using native C++ pipelines.
-- **⚡ Zero Latency** — Real-time results for massive file systems.
-- **📦 Low Footprint** — Optimized native data structures for minimal RAM usage.
+- **?? Instant Indexing** � Scan millions of files in milliseconds using native C++ pipelines.
+- **? Zero Latency** � Real-time results for massive file systems.
+- **?? Low Footprint** � Optimized native data structures for minimal RAM usage.
 
 ---
 
@@ -107,10 +107,10 @@ dependencies {
 
 Download the latest JARs directly to add them to your classpath:
 
-1. 📦 *
+1. ?? *
    *[fastfileindex-v0.1.0.jar](https://github.com/andrestubbe/FastFileIndex/releases/download/v0.1.0/fastfileindex-v0.1.0.jar)
    ** (The Core Library)
-2. ⚙️ **[fastcore-v0.1.0.jar](https://github.com/andrestubbe/FastCore/releases/download/v0.1.0/fastcore-v0.1.0.jar)** (
+2. ?? **[fastcore-v0.1.0.jar](https://github.com/andrestubbe/FastCore/releases/download/v0.1.0/fastcore-v0.1.0.jar)** (
    The Mandatory Native Loader)
 
 ---
@@ -128,7 +128,7 @@ Download the latest JARs directly to add them to your classpath:
 
 * **[COMPILE.md](docs/COMPILE.md)**: Full compilation guide (MSVC C++17 build chain + JNI Setup).
 * **[REFERENCE.md](docs/REFERENCE.md)**: Full API descriptions, border configurations, and codepoint index.
-* **[PHILOSOPHIE.md](docs/PHILOSOPHIE.md)**: The engineering rationale for zero-allocation performance.
+* **[PHILOSOPHY.md](docs/PHILOSOPHY.md)**: The engineering rationale for zero-allocation performance.
 * **[ROADMAP.md](docs/ROADMAP.md)**: Future milestones and planned features.
 
 ---
@@ -137,15 +137,15 @@ Download the latest JARs directly to add them to your classpath:
 
 | Platform      | Status            |
 |---------------|-------------------|
-| Windows 10/11 | ✅ Fully Supported |
-| Linux         | 🚧 Planned        |
-| macOS         | 🚧 Planned        |
+| Windows 10/11 | ? Fully Supported |
+| Linux         | ?? Planned        |
+| macOS         | ?? Planned        |
 
 ---
 
 ## License
 
-MIT License — See [LICENSE](LICENSE) file for details.
+MIT License � See [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -158,4 +158,4 @@ MIT License — See [LICENSE](LICENSE) file for details.
 
 ---
 
-**Part of the FastJava Ecosystem** — *Making the JVM faster. Small package. Maximum speed. Zero bloat. 🚀📋*
+**Part of the FastJava Ecosystem** � *Making the JVM faster. Small package. Maximum speed. Zero bloat. ????*
