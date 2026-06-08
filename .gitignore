@@ -2,6 +2,7 @@
 target/
 build/
 *.dll
+!src/main/resources/native/*.dll
 *.obj
 *.exp
 *.lib
