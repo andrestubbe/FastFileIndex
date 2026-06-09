@@ -36,38 +36,11 @@
                 <includes>
                     <include>*.dll</include>
                 </includes>
+                <targetPath>native</targetPath>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <finalName>${project.artifactId}-${project.version}</finalName>
-                    <archive>
-                        <manifest>
-                            <mainClass>fastfileindex.FastFileIndex</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 </project>
