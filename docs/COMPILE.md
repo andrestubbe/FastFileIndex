@@ -40,14 +40,14 @@ mvn clean package
 ```
 
 This creates:
-- `target/fastfileindex-v1.0.0.jar` - FatJAR with all dependencies and native DLL (includes fastfileindex.dll)
+- `target/fastfileindex-0.1.1.jar` - FatJAR with all dependencies and native DLL (includes fastfileindex.dll)
 
 ## Running Examples
 
 ```bash
 cd build
-javac -cp ..\target\fastfileindex-v1.0.0.jar ..\examples\Demo\src\main\java\fastfileindex\Demo.java -d ..\examples\Demo\src\main\java
-java -cp ..\target\fastfileindex-v1.0.0.jar;..\examples\Demo\src\main\java fastfileindex.Demo
+javac -cp ..\target\fastfileindex-0.1.1.jar ..\examples\Demo\src\main\java\fastfileindex\Demo.java -d ..\examples\Demo\src\main\java
+java -cp ..\target\fastfileindex-0.1.1.jar;..\examples\Demo\src\main\java fastfileindex.Demo
 ```
 
 ## Troubleshooting

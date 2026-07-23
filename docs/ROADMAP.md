@@ -2,10 +2,11 @@
 
 **Vision:** To provide the fastest possible native primitives for file indexing by aggressively bypassing bottlenecks in standard Java.
 
-## 🟢 v0.1.0: Initial Release (Current)
+## 🟢 v0.1.1: Robust Native Traversal & Metrics (Current)
 - [x] **Core Native Engine**: Basic JNI implementation.
+- [x] **Non-Throwing Traversal**: Robust `std::error_code` loop skipping Windows junction points.
 - [x] **Blueprint Standards**: README, Reference, and Philosophy integration.
-- [ ] **Basic Performance Suite**: Initial benchmarks vs standard Java.
+- [x] **Basic Performance Suite**: Initial benchmarks vs standard Java.
 
 ## 🟡 v0.2.0: Optimization Phase
 - [ ] **SIMD Acceleration**: Implement AVX2/SSE4.2 paths for core loops.

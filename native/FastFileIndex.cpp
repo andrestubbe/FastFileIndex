@@ -126,22 +126,34 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_build(
     }
 
     for (auto& root : roots) {
-        try {
-            for (auto& p : filesystem::recursive_directory_iterator(root, filesystem::directory_options::skip_permission_denied)) {
-                if (!p.is_regular_file()) continue;
+        std::error_code ec;
+        auto it = filesystem::recursive_directory_iterator(root, filesystem::directory_options::skip_permission_denied, ec);
+        auto end = filesystem::recursive_directory_iterator();
 
-                FileEntry e;
-                e.path = p.path().string();
-                e.id = hash64(e.path);
-                e.parentId = hash64(p.path().parent_path().string());
-                e.size = p.file_size();
-                e.modified = toUnixTS(p.last_write_time());
-                e.type = detectType(e.path);
-
-                g_entries.push_back(std::move(e));
+        while (it != end) {
+            if (ec) {
+                ec.clear();
+                it.increment(ec);
+                continue;
             }
-        } catch (const exception& ex) {
-            // Skip directories we can't access
+
+            try {
+                if (it->is_regular_file(ec)) {
+                    FileEntry e;
+                    e.path = it->path().string();
+                    e.id = hash64(e.path);
+                    e.parentId = hash64(it->path().parent_path().string());
+                    e.size = it->file_size(ec);
+                    e.modified = toUnixTS(it->last_write_time(ec));
+                    e.type = detectType(e.path);
+
+                    g_entries.push_back(std::move(e));
+                }
+            } catch (...) {
+                // Ignore any unreadable entry
+            }
+
+            it.increment(ec);
         }
     }
 }
@@ -181,29 +193,39 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_buildWithProgress(
     long totalFiles = 0; // Unknown, will be 0
     long currentFile = 0;
     for (auto& root : roots) {
-        try {
-            for (auto& p : filesystem::recursive_directory_iterator(root, filesystem::directory_options::skip_permission_denied)) {
-                if (!p.is_regular_file()) continue;
+        std::error_code ec;
+        auto it = filesystem::recursive_directory_iterator(root, filesystem::directory_options::skip_permission_denied, ec);
+        auto end = filesystem::recursive_directory_iterator();
 
-                FileEntry e;
-                e.path = p.path().string();
-                e.id = hash64(e.path);
-                e.parentId = hash64(p.path().parent_path().string());
-                e.size = p.file_size();
-                e.modified = toUnixTS(p.last_write_time());
-                e.type = detectType(e.path);
-
-                // Call progress callback for every file (for FileRush real-time display)
-                // Must do this BEFORE moving e to g_entries, otherwise path becomes empty
-                jstring jpath = env->NewStringUTF(e.path.c_str());
-                env->CallVoidMethod(jcallback, onProgressMethod, (jlong)currentFile, (jlong)totalFiles, jpath);
-                env->DeleteLocalRef(jpath);
-
-                g_entries.push_back(std::move(e));
-                currentFile++;
+        while (it != end) {
+            if (ec) {
+                ec.clear();
+                it.increment(ec);
+                continue;
             }
-        } catch (const exception& ex) {
-            // Skip directories we can't access
+
+            try {
+                if (it->is_regular_file(ec)) {
+                    FileEntry e;
+                    e.path = it->path().string();
+                    e.id = hash64(e.path);
+                    e.parentId = hash64(it->path().parent_path().string());
+                    e.size = it->file_size(ec);
+                    e.modified = toUnixTS(it->last_write_time(ec));
+                    e.type = detectType(e.path);
+
+                    jstring jpath = env->NewStringUTF(e.path.c_str());
+                    env->CallVoidMethod(jcallback, onProgressMethod, (jlong)currentFile, (jlong)totalFiles, jpath);
+                    env->DeleteLocalRef(jpath);
+
+                    g_entries.push_back(std::move(e));
+                    currentFile++;
+                }
+            } catch (...) {
+                // Ignore any unreadable entry
+            }
+
+            it.increment(ec);
         }
     }
 
