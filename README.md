@@ -13,18 +13,26 @@ to provide direct, native-accelerated indexing and search capabilities for massi
 
 [![FastFileIndex Showcase](docs/screenshot.png)](https://www.youtube.com/watch?v=BZsqQl7WqWk)
 
-```java
-// Quick Start  Indexing a directory
+---
 
+## Quick Start
+
+```java
 import fastfileindex.FastFileIndex;
 
 public class Demo {
     public static void main(String[] args) {
-        String[] roots = {"C:\\"};
+        // Scan directory trees with native C++ mmap indexing
+        String[] roots = { "C:\\" };
         FastFileIndex.build(roots);
 
         long count = FastFileIndex.getEntryCount();
-        System.out.println("Indexed " + count + " files!");
+        System.out.printf("Indexed %,d files in real-time!\n", count);
+
+        // Access indexed metadata directly
+        for (long i = 0; i < Math.min(count, 5); i++) {
+            System.out.printf("[%d bytes] %s\n", FastFileIndex.getEntrySize(i), FastFileIndex.getEntryPath(i));
+        }
     }
 }
 ```
