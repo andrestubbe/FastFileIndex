@@ -11,7 +11,7 @@
 FastFileIndex is the high-performance file indexing engine for the FastJava ecosystem. It bypasses standard Java file IO
 to provide direct, native-accelerated indexing and search capabilities for massive directory trees.
 
-[![FastFileIndex Showcase](docs/screenshot.png)](https://www.youtube.com/watch?v=BZsqQl7WqWk)
+[![FastFileIndex Showcase](docs/screenshot.png)](https://youtu.be/69XEJ49yqbA)
 
 ---
 
