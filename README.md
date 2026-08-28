@@ -100,17 +100,21 @@ Add the JitPack repository and the dependencies to your `pom.xml`:
         <url>https://jitpack.io</url>
     </repository>
 </repositories>
+
 <dependencies>
-   <dependency>
-       <groupId>com.github.andrestubbe</groupId>
-       <artifactId>fastfileindex</artifactId>
-       <version>0.1.1</version>
-   </dependency>
-   <dependency>
-       <groupId>com.github.andrestubbe</groupId>
-       <artifactId>fastcore</artifactId>
-       <version>0.1.0</version>
-   </dependency>
+    <!-- FastFileIndex Library -->
+    <dependency>
+        <groupId>com.github.andrestubbe</groupId>
+        <artifactId>FastFileIndex</artifactId>
+        <version>0.1.2</version>
+    </dependency>
+
+    <!-- FastCore (Required Native Loader) -->
+    <dependency>
+        <groupId>com.github.andrestubbe</groupId>
+        <artifactId>FastCore</artifactId>
+        <version>0.1.0</version>
+    </dependency>
 </dependencies>
 ```
 
@@ -122,8 +126,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.andrestubbe:fastfileindex:0.1.1'
-    implementation 'com.github.andrestubbe:fastcore:0.1.0'
+    implementation 'com.github.andrestubbe:FastFileIndex:0.1.2'
+    implementation 'com.github.andrestubbe:FastCore:0.1.0'
 }
 ```
 
@@ -131,7 +135,7 @@ dependencies {
 
 Download the latest JARs directly to add them to your classpath:
 
-1. 📦 **[fastfileindex-0.1.1.jar](https://github.com/andrestubbe/FastFileIndex/releases/download/0.1.1/fastfileindex-0.1.1.jar)** (The Core Library)
+1. 📦 **[FastFileIndex-0.1.2.jar](https://github.com/andrestubbe/FastFileIndex/releases/download/0.1.2/FastFileIndex-0.1.2.jar)** (The Core Library)
 2. ⚙️ **[fastcore-0.1.0.jar](https://github.com/andrestubbe/FastCore/releases/download/0.1.0/fastcore-0.1.0.jar)** (The Mandatory Native Loader)
 
 ---
