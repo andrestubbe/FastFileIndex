@@ -1,13 +1,6 @@
 /**
  * @file FastFileIndex.cpp
  * @brief FastFileIndex native implementation
- *
- * @details Implements native methods for FastFileIndex - Creates a compact, append-only, mmap-friendly binary index of all files.
- * Part of the FastJava file search engine trilogy (FastFileIndex, FastFileSearch, FastFileWatch).
- *
- * @author FastJava Team
- * @version v1.0.0
- * @copyright MIT License
  */
 
 #include <jni.h>
@@ -22,10 +15,6 @@
 #include <atomic>
 
 using namespace std;
-
-// ============================================================================
-// Data Structures
-// ============================================================================
 
 struct FileEntryHeader {
     uint64_t id;
@@ -46,10 +35,6 @@ struct FileEntry {
     string path;
 };
 
-// ============================================================================
-// Global State
-// ============================================================================
-
 static vector<FileEntry> g_entries;
 static mutex g_entriesMutex;
 static char* g_mappedData = nullptr;
@@ -57,55 +42,41 @@ static HANDLE g_hMap = nullptr;
 static HANDLE g_hFile = nullptr;
 static size_t g_fileSize = 0;
 
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
-static inline uint64_t fnv1a(const char* data, size_t len) {
-    uint64_t h = 1469598103934665603ULL;
-    for (size_t i = 0; i < len; i++) {
-        h ^= (uint64_t)(unsigned char)data[i];
-        h *= 1099511628211ULL;
+static uint64_t hash64(const string& str) {
+    uint64_t hash = 14695981039346656037ULL;
+    for (char c : str) {
+        hash ^= (uint8_t)c;
+        hash *= 1099511628211ULL;
     }
-    return h;
+    return hash;
 }
 
-static uint64_t hash64(const string& s) {
-    return fnv1a(s.data(), s.size());
-}
-
-static uint32_t detectType(const string& path) {
-    auto ext = filesystem::path(path).extension().string();
-    for (auto& c : ext) c = tolower(c);
-
-    if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif" || ext == ".bmp" || ext == ".webp") return 1;
-    if (ext == ".pdf") return 2;
-    if (ext == ".txt" || ext == ".md") return 3;
-    if (ext == ".cpp" || ext == ".h" || ext == ".hpp" || ext == ".c" || ext == ".java" || ext == ".py" || ext == ".js") return 4;
-    if (ext == ".mp4" || ext == ".avi" || ext == ".mkv" || ext == ".mov") return 5;
-    if (ext == ".mp3" || ext == ".wav" || ext == ".flac") return 6;
-    if (ext == ".zip" || ext == ".rar" || ext == ".7z") return 7;
-    return 0;
-}
-
-static uint64_t toUnixTS(const filesystem::file_time_type& ft) {
+static uint64_t toUnixTS(filesystem::file_time_type ft) {
     auto sctp = chrono::time_point_cast<chrono::system_clock::duration>(
-        ft - filesystem::file_time_type::clock::now()
-        + chrono::system_clock::now()
-    );
+        ft - filesystem::file_time_type::clock::now() + chrono::system_clock::now());
     return chrono::duration_cast<chrono::seconds>(sctp.time_since_epoch()).count();
 }
 
-// ============================================================================
-// ============================================================================
-// JNI Implementation
-// ============================================================================
+static uint32_t detectType(const string& path) {
+    size_t dot = path.rfind('.');
+    if (dot == string::npos) return 0;
+    string ext = path.substr(dot + 1);
+    for (auto& c : ext) c = tolower(c);
+    
+    if (ext == "java" || ext == "cpp" || ext == "h" || ext == "c" || ext == "py" || ext == "js" || ext == "ts") return 1;
+    if (ext == "txt" || ext == "md" || ext == "json" || ext == "xml" || ext == "yaml" || ext == "yml") return 2;
+    if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif" || ext == "bmp" || ext == "ico") return 3;
+    if (ext == "zip" || ext == "tar" || ext == "gz" || ext == "7z" || ext == "rar" || ext == "jar") return 4;
+    if (ext == "exe" || ext == "dll" || ext == "so" || ext == "dylib") return 5;
+    return 0;
+}
 
 extern "C" {
 
-/**
- * @brief Build file index by scanning root directories
- */
+JNIEXPORT void* JNICALL FastFileIndex_getNativeEntriesHandle() {
+    return (void*)&g_entries;
+}
+
 JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_build(
     JNIEnv* env,
     jclass clazz,
@@ -150,7 +121,6 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_build(
                     g_entries.push_back(std::move(e));
                 }
             } catch (...) {
-                // Ignore any unreadable entry
             }
 
             it.increment(ec);
@@ -158,14 +128,6 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_build(
     }
 }
 
-/**
- * @brief Build file index with progress callback
- * 
- * @param env JNI environment pointer
- * @param clazz Java class object
- * @param jroots Array of root directory paths
- * @param jcallback Progress callback object
- */
 JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_buildWithProgress(
     JNIEnv* env,
     jclass clazz,
@@ -186,11 +148,10 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_buildWithProgress(
         env->ReleaseStringUTFChars(jroot, root);
     }
 
-    // Get callback class and method
     jclass callbackClass = env->GetObjectClass(jcallback);
     jmethodID onProgressMethod = env->GetMethodID(callbackClass, "onProgress", "(JJLjava/lang/String;)V");
 
-    long totalFiles = 0; // Unknown, will be 0
+    long totalFiles = 0;
     long currentFile = 0;
     for (auto& root : roots) {
         std::error_code ec;
@@ -222,7 +183,6 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_buildWithProgress(
                     currentFile++;
                 }
             } catch (...) {
-                // Ignore any unreadable entry
             }
 
             it.increment(ec);
@@ -232,140 +192,110 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_buildWithProgress(
     env->DeleteLocalRef(callbackClass);
 }
 
-/**
- * @brief Save index to binary file
- * 
- * @param env JNI environment pointer
- * @param clazz Java class object
- * @param jindexPath Path to save the index file
- */
 JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_save(
     JNIEnv* env,
     jclass clazz,
     jstring jindexPath) {
 
     lock_guard<mutex> lock(g_entriesMutex);
-
     const char* indexPath = env->GetStringUTFChars(jindexPath, nullptr);
     string indexPathStr(indexPath);
+    env->ReleaseStringUTFChars(jindexPath, indexPath);
 
-    // First, build paths blob
-    vector<char> pathsBlob;
-    size_t totalPathSize = 0;
-    for (auto& e : g_entries) {
-        totalPathSize += e.path.size();
-    }
-    pathsBlob.reserve(totalPathSize);
-
-    vector<uint32_t> pathOffsets;
-    size_t currentOffset = 0;
-    for (auto& e : g_entries) {
-        pathOffsets.push_back(currentOffset);
-        pathsBlob.insert(pathsBlob.end(), e.path.begin(), e.path.end());
-        currentOffset += e.path.size();
-    }
-
-    // Write paths.bin
-    string pathsPath = indexPathStr + ".paths";
-    ofstream pathsOut(pathsPath, ios::binary);
-    pathsOut.write(pathsBlob.data(), pathsBlob.size());
-    pathsOut.close();
-
-    // Write files.idx
     ofstream out(indexPathStr, ios::binary);
-    for (size_t i = 0; i < g_entries.size(); i++) {
+    if (!out) return;
+
+    string pathsStr = indexPathStr + ".paths";
+    ofstream outPaths(pathsStr, ios::binary);
+    if (!outPaths) return;
+
+    uint32_t pathOffset = 0;
+    for (auto& e : g_entries) {
         FileEntryHeader h;
-        h.id = g_entries[i].id;
-        h.parentId = g_entries[i].parentId;
-        h.size = g_entries[i].size;
-        h.modified = g_entries[i].modified;
-        h.type = g_entries[i].type;
-        h.pathOffset = pathOffsets[i];
-        h.pathLen = g_entries[i].path.size();
+        h.id = e.id;
+        h.parentId = e.parentId;
+        h.size = e.size;
+        h.modified = e.modified;
+        h.type = e.type;
+        h.pathOffset = pathOffset;
+        h.pathLen = (uint32_t)e.path.length();
 
         out.write((char*)&h, sizeof(h));
+        outPaths.write(e.path.c_str(), e.path.length());
+        pathOffset += h.pathLen;
     }
-    out.close();
-
-    env->ReleaseStringUTFChars(jindexPath, indexPath);
 }
 
-JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_load(JNIEnv* env, jclass clazz, jstring jindexPath) {
-    lock_guard<mutex> lock(g_entriesMutex);
-    
-    // Clean up previous mapping
-    if (g_mappedData) { UnmapViewOfFile(g_mappedData); g_mappedData = nullptr; }
-    if (g_hMap) { CloseHandle(g_hMap); g_hMap = nullptr; }
-    if (g_hFile) { CloseHandle(g_hFile); g_hFile = nullptr; }
-    g_entries.clear();
+JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_load(
+    JNIEnv* env,
+    jclass clazz,
+    jstring jindexPath) {
 
+    lock_guard<mutex> lock(g_entriesMutex);
     const char* indexPath = env->GetStringUTFChars(jindexPath, nullptr);
-    if (!indexPath) return;
     string indexPathStr(indexPath);
     env->ReleaseStringUTFChars(jindexPath, indexPath);
 
-    // 1. Load paths
-    string pathsPath = indexPathStr + ".paths";
-    ifstream pathsIn(pathsPath, ios::binary | ios::ate);
-    if (!pathsIn.is_open()) return;
-    size_t pathsSize = pathsIn.tellg();
-    pathsIn.seekg(0, ios::beg);
-    vector<char> pathsBlob(pathsSize);
-    pathsIn.read(pathsBlob.data(), pathsSize);
-    pathsIn.close();
+    if (g_mappedData) UnmapViewOfFile(g_mappedData);
+    if (g_hMap) CloseHandle(g_hMap);
+    if (g_hFile) CloseHandle(g_hFile);
+    g_entries.clear();
 
-    // 2. Map index
     g_hFile = CreateFileA(indexPathStr.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (g_hFile == INVALID_HANDLE_VALUE) return;
-    DWORD fileSize = GetFileSize(g_hFile, NULL);
-    g_fileSize = fileSize;
-    g_hMap = CreateFileMappingA(g_hFile, NULL, PAGE_READONLY, 0, fileSize, NULL);
-    if (!g_hMap) { CloseHandle(g_hFile); g_hFile = nullptr; return; }
-    g_mappedData = (char*)MapViewOfFile(g_hMap, FILE_MAP_READ, 0, 0, fileSize);
-    if (!g_mappedData) { CloseHandle(g_hMap); CloseHandle(g_hFile); g_hMap = nullptr; g_hFile = nullptr; return; }
 
-    // 3. Parse
-    size_t offset = 0;
-    while (offset < fileSize) {
-        FileEntryHeader* h = (FileEntryHeader*)(g_mappedData + offset);
-        offset += sizeof(FileEntryHeader);
+    DWORD sizeHigh = 0;
+    DWORD sizeLow = GetFileSize(g_hFile, &sizeHigh);
+    g_fileSize = ((size_t)sizeHigh << 32) | sizeLow;
+
+    g_hMap = CreateFileMappingA(g_hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+    if (!g_hMap) {
+        CloseHandle(g_hFile);
+        return;
+    }
+
+    g_mappedData = (char*)MapViewOfFile(g_hMap, FILE_MAP_READ, 0, 0, 0);
+    if (!g_mappedData) {
+        CloseHandle(g_hMap);
+        CloseHandle(g_hFile);
+        return;
+    }
+
+    string pathsStr = indexPathStr + ".paths";
+    ifstream inPaths(pathsStr, ios::binary);
+    if (!inPaths) return;
+
+    size_t count = g_fileSize / sizeof(FileEntryHeader);
+    g_entries.reserve(count);
+
+    FileEntryHeader* headers = (FileEntryHeader*)g_mappedData;
+    for (size_t i = 0; i < count; i++) {
         FileEntry e;
-        e.id = h->id; e.parentId = h->parentId; e.size = h->size; e.modified = h->modified; e.type = h->type;
-        if (h->pathOffset + h->pathLen <= pathsBlob.size()) {
-            e.path = string(pathsBlob.data() + h->pathOffset, h->pathLen);
-        }
+        e.id = headers[i].id;
+        e.parentId = headers[i].parentId;
+        e.size = headers[i].size;
+        e.modified = headers[i].modified;
+        e.type = headers[i].type;
+
+        e.path.resize(headers[i].pathLen);
+        inPaths.seekg(headers[i].pathOffset);
+        inPaths.read(&e.path[0], headers[i].pathLen);
+
         g_entries.push_back(std::move(e));
     }
 }
 
-/**
- * @brief Get the number of entries in the loaded index
- * 
- * @param env JNI environment pointer
- * @param clazz Java class object
- * @return Number of file entries
- */
 JNIEXPORT jlong JNICALL Java_fastfileindex_FastFileIndex_getEntryCount(
     JNIEnv* env,
     jclass clazz) {
-
     lock_guard<mutex> lock(g_entriesMutex);
     return (jlong)g_entries.size();
 }
 
-/**
- * @brief Get the path of a file entry by index
- * 
- * @param env JNI environment pointer
- * @param clazz Java class object
- * @param index Index of the entry (0-based)
- * @return File path as JNI string
- */
 JNIEXPORT jstring JNICALL Java_fastfileindex_FastFileIndex_getEntryPath(
     JNIEnv* env,
     jclass clazz,
     jlong index) {
-
     lock_guard<mutex> lock(g_entriesMutex);
     if (index < 0 || index >= (jlong)g_entries.size()) {
         return nullptr;
@@ -373,19 +303,10 @@ JNIEXPORT jstring JNICALL Java_fastfileindex_FastFileIndex_getEntryPath(
     return env->NewStringUTF(g_entries[index].path.c_str());
 }
 
-/**
- * @brief Get the size of a file entry by index
- * 
- * @param env JNI environment pointer
- * @param clazz Java class object
- * @param index Index of the entry (0-based)
- * @return File size in bytes
- */
 JNIEXPORT jlong JNICALL Java_fastfileindex_FastFileIndex_getEntrySize(
     JNIEnv* env,
     jclass clazz,
     jlong index) {
-
     lock_guard<mutex> lock(g_entriesMutex);
     if (index < 0 || index >= (jlong)g_entries.size()) {
         return 0;
@@ -393,19 +314,10 @@ JNIEXPORT jlong JNICALL Java_fastfileindex_FastFileIndex_getEntrySize(
     return (jlong)g_entries[index].size;
 }
 
-/**
- * @brief Get the modification time of a file entry by index
- * 
- * @param env JNI environment pointer
- * @param clazz Java class object
- * @param index Index of the entry (0-based)
- * @return Unix timestamp
- */
 JNIEXPORT jlong JNICALL Java_fastfileindex_FastFileIndex_getEntryModified(
     JNIEnv* env,
     jclass clazz,
     jlong index) {
-
     lock_guard<mutex> lock(g_entriesMutex);
     if (index < 0 || index >= (jlong)g_entries.size()) {
         return 0;
@@ -413,19 +325,10 @@ JNIEXPORT jlong JNICALL Java_fastfileindex_FastFileIndex_getEntryModified(
     return (jlong)g_entries[index].modified;
 }
 
-/**
- * @brief Get the type of a file entry by index
- * 
- * @param env JNI environment pointer
- * @param clazz Java class object
- * @param index Index of the entry (0-based)
- * @return File type enum value
- */
 JNIEXPORT jint JNICALL Java_fastfileindex_FastFileIndex_getEntryType(
     JNIEnv* env,
     jclass clazz,
     jlong index) {
-
     lock_guard<mutex> lock(g_entriesMutex);
     if (index < 0 || index >= (jlong)g_entries.size()) {
         return 0;
@@ -433,14 +336,8 @@ JNIEXPORT jint JNICALL Java_fastfileindex_FastFileIndex_getEntryType(
     return (jint)g_entries[index].type;
 }
 
-/**
- * @brief JNI Implementation for fastfileindex.FileIndex (Object-Oriented)
- */
 JNIEXPORT jobject JNICALL Java_fastfileindex_FileIndex_open__Ljava_lang_String_2(JNIEnv* env, jclass clazz, jstring indexPath) {
-    // 1. Load the index using the static logic
     Java_fastfileindex_FastFileIndex_load(env, clazz, indexPath);
-    
-    // 2. Create new FileIndex instance
     jmethodID constructor = env->GetMethodID(clazz, "<init>", "(J)V");
     if (constructor == NULL) return NULL;
     return env->NewObject(clazz, constructor, (jlong)0xABCDEF);
@@ -451,7 +348,6 @@ JNIEXPORT jlong JNICALL Java_fastfileindex_FileIndex_entryCount(JNIEnv* env, job
 }
 
 JNIEXPORT void JNICALL Java_fastfileindex_FileIndex_close(JNIEnv* env, jobject obj) {
-    // Cleanup global state
     lock_guard<mutex> lock(g_entriesMutex);
     if (g_mappedData) UnmapViewOfFile(g_mappedData);
     if (g_hMap) CloseHandle(g_hMap);
@@ -464,9 +360,6 @@ JNIEXPORT void JNICALL Java_fastfileindex_FileIndex_close(JNIEnv* env, jobject o
 
 } // extern "C"
 
-/**
- * @brief DLL entry point
- */
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved) {
     return TRUE;
 }

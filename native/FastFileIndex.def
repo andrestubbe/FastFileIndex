@@ -1,5 +1,6 @@
 LIBRARY fastfileindex
 EXPORTS
+    FastFileIndex_getNativeEntriesHandle
     Java_fastfileindex_FastFileIndex_build
     Java_fastfileindex_FastFileIndex_buildWithProgress
     Java_fastfileindex_FastFileIndex_save
