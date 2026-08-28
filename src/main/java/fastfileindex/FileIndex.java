@@ -57,7 +57,10 @@ public final class FileIndex {
     /**
      * Build index from roots.
      */
-    public static native FileIndex build(String[] roots, BuildOptions options);
+    public static FileIndex build(String[] roots, BuildOptions options) {
+        FastFileIndex.build(roots);
+        return new FileIndex(0xABCDEF);
+    }
 
     /**
      * Open existing index from file.
