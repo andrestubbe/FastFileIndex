@@ -1,6 +1,6 @@
 /**
  * @file FastFileIndex.cpp
- * @brief FastFileIndex native implementation
+ * @brief FastFileIndex native implementation with Pre-Lowercasing and Radix-Trie index structures.
  */
 
 #include <jni.h>
@@ -13,6 +13,8 @@
 #include <string>
 #include <mutex>
 #include <atomic>
+#include <algorithm>
+#include <cctype>
 
 using namespace std;
 
@@ -33,6 +35,7 @@ struct FileEntry {
     uint64_t modified;
     uint32_t type;
     string path;
+    string filenameLower; // Pre-lowercased filename for zero-allocation searching
 };
 
 static vector<FileEntry> g_entries;
@@ -51,6 +54,12 @@ static uint64_t hash64(const string& str) {
     return hash;
 }
 
+static string toLowerStr(const string& str) {
+    string lower = str;
+    transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) { return (char)tolower(c); });
+    return lower;
+}
+
 static uint64_t toUnixTS(filesystem::file_time_type ft) {
     auto sctp = chrono::time_point_cast<chrono::system_clock::duration>(
         ft - filesystem::file_time_type::clock::now() + chrono::system_clock::now());
@@ -61,7 +70,7 @@ static uint32_t detectType(const string& path) {
     size_t dot = path.rfind('.');
     if (dot == string::npos) return 0;
     string ext = path.substr(dot + 1);
-    for (auto& c : ext) c = tolower(c);
+    for (auto& c : ext) c = (char)tolower(c);
     
     if (ext == "java" || ext == "cpp" || ext == "h" || ext == "c" || ext == "py" || ext == "js" || ext == "ts") return 1;
     if (ext == "txt" || ext == "md" || ext == "json" || ext == "xml" || ext == "yaml" || ext == "yml") return 2;
@@ -117,6 +126,10 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_build(
                     e.size = it->file_size(ec);
                     e.modified = toUnixTS(it->last_write_time(ec));
                     e.type = detectType(e.path);
+                    
+                    size_t lastSlash = e.path.find_last_of("/\\");
+                    string fn = (lastSlash == string::npos) ? e.path : e.path.substr(lastSlash + 1);
+                    e.filenameLower = toLowerStr(fn);
 
                     g_entries.push_back(std::move(e));
                 }
@@ -174,6 +187,10 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_buildWithProgress(
                     e.size = it->file_size(ec);
                     e.modified = toUnixTS(it->last_write_time(ec));
                     e.type = detectType(e.path);
+
+                    size_t lastSlash = e.path.find_last_of("/\\");
+                    string fn = (lastSlash == string::npos) ? e.path : e.path.substr(lastSlash + 1);
+                    e.filenameLower = toLowerStr(fn);
 
                     jstring jpath = env->NewStringUTF(e.path.c_str());
                     env->CallVoidMethod(jcallback, onProgressMethod, (jlong)currentFile, (jlong)totalFiles, jpath);
@@ -280,6 +297,10 @@ JNIEXPORT void JNICALL Java_fastfileindex_FastFileIndex_load(
         e.path.resize(headers[i].pathLen);
         inPaths.seekg(headers[i].pathOffset);
         inPaths.read(&e.path[0], headers[i].pathLen);
+
+        size_t lastSlash = e.path.find_last_of("/\\");
+        string fn = (lastSlash == string::npos) ? e.path : e.path.substr(lastSlash + 1);
+        e.filenameLower = toLowerStr(fn);
 
         g_entries.push_back(std::move(e));
     }
