@@ -60,21 +60,21 @@ public class Demo {
 
 Indexing large file systems (e.g. hundreds of thousands or millions of source code, media, or build files) inside Java applications causes severe bottlenecks with standard JDK APIs:
 
-* **Massive JVM Heap Bloat:** Traversal via `Files.walkFileTree()` instantiates `Path`, `FileStore`, and `BasicFileAttributes` instances for every single file, easily creating millions of short-lived objects and triggering prolonged GC stop-the-world pauses.
-* **Reparse Point & Permission Crashes:** Java NIO default traversals throw unhandled `AccessDeniedException` or `FileSystemLoopException` when encountering Windows Junctions, locked system folders, or cyclic symlinks.
-* **Repeated Case Normalization Overhead:** Search routines scanning millions of paths repeatedly call `.toLowerCase()` on Java strings, churning memory for every character search query.
-* **Slow Re-Indexing on Application Restart:** Persisting large directory structures in JSON or serialized Java objects requires costly parsing loops instead of instant memory-mapped disk snapshots.
+- **Massive JVM Heap Bloat** — Traversal via `Files.walkFileTree()` instantiates `Path`, `FileStore`, and `BasicFileAttributes` instances for every single file, easily creating millions of short-lived objects and triggering prolonged GC stop-the-world pauses.
+- **Reparse Point & Permission Crashes** — Java NIO default traversals throw unhandled `AccessDeniedException` or `FileSystemLoopException` when encountering Windows Junctions, locked system folders, or cyclic symlinks.
+- **Repeated Case Normalization Overhead** — Search routines scanning millions of paths repeatedly call `.toLowerCase()` on Java strings, churning memory for every character search query.
+- **Slow Re-Indexing on Application Restart** — Persisting large directory structures in JSON or serialized Java objects requires costly parsing loops instead of instant memory-mapped disk snapshots.
 
-FastFileIndex solves this with a dedicated native C++ engine (`FastFileIndex.cpp`). It scans directory trees using robust `std::error_code` traversals, pre-calculates 64-bit parent/path hashes and lowercased lookup keys off-heap, and persists indexes directly via high-speed binary memory mapping (`mmap`).
+FastFileIndex solves this by pairing direct Win32 C++ kernel iterators with zero-allocation memory-mapped file indexing:
 
-| Feature | `java.io.File.listFiles()` | `java.nio.file.Files.walk()` | Apache Commons IO | FastFileIndex |
-| :--- | :--- | :--- | :--- | :--- |
-| **Traversal Engine** | Legacy Win32 wrapper | NIO2 FileVisitor | Recursive iterator wrapper | **Native C++17 Iterator** |
-| **Object Allocation (1M Files)** | ~1,000,000 File objects | ~3,000,000 Path/Attr objects | ~1,000,000 File objects | **0 Heap Objects (Off-Heap C++)** |
-| **Windows Permission Resilience** | Returns `null` on error | Throws `AccessDeniedException` | Throws / fails on junctions | **Non-throwing `std::error_code` Skip** |
-| **Search Readiness** | Raw string comparisons | Raw string comparisons | Raw string comparisons | **Pre-Lowercased & 64-bit Hash Keys** |
-| **Cold Startup / Persistence** | Slow manual parsing | Slow serialization | Manual text/binary file write | **Direct Binary Disk Handoff (`mmap`)** |
-| **Dependencies** | JDK standard lib | JDK standard lib | External JAR (~3 MB) | **Native DLL via FastCore** |
+| Feature | Legacy `java.io.File` | Java NIO2 (`Files.walk`) | FastFileIndex |
+|:---|:---|:---|:---|
+| **Traversal Engine** | Legacy Win32 wrapper | NIO2 FileVisitor | **Native C++17 Iterator** |
+| **Objects (1M Files)** | ~1,000,000 File objects | ~3,000,000 Path objects | **0 Heap Objects (Zero GC)** |
+| **Permission Errors** | Returns `null` on error | Throws AccessDenied | **Non-throwing skip** |
+| **Search Readiness** | Raw string checks | Raw string checks | **Pre-Lowercased + 64-bit Hashes** |
+| **Disk Handoff** | Slow manual parsing | Slow serialization | **Binary `mmap` Snapshot** |
+| **Dependencies** | JDK runtime | JDK runtime | **Pure Java + FastCore** |
 
 ---
 
