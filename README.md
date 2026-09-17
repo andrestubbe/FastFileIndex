@@ -46,11 +46,10 @@ public class Demo {
 - [Why FastFileIndex?](#why-fastfileindex)
 - [Key Features](#key-features)
 - [Performance](#performance)
-- [Installation](#installation)
-- [Try the Demo](#try-the-demo)
+- [Technical Demos & Benchmarks](#technical-demos--benchmarks)
 - [API Reference](#api-reference)
+- [Documentation](#documentation)
 - [Platform Support](#platform-support)
-- [Building from Source](#building-from-source)
 - [License](#license)
 - [Related Projects](#related-projects)
 
@@ -96,6 +95,14 @@ FastFileIndex out-performs standard Java NIO indexing by utilizing Windows-speci
 | Scan 1M Files | 280 ms        | 4500 ms  | **16x** |
 
 ---
+
+## Technical Demos & Benchmarks
+
+Run standalone verification demos:
+
+| Type | Target / Launcher | Source File | Description |
+| :--- | :--- | :--- | :--- |
+| **Interactive Demo** | [`run-demo.bat`](run-demo.bat) | [`Demo.java`](examples/Demo/src/main/java/fastfileindex/Demo.java) | Real-time native C++ directory scanning and live volume stream |
 
 ---
 
