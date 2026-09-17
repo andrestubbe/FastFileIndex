@@ -47,6 +47,7 @@ public class Demo {
 - [Key Features](#key-features)
 - [Performance](#performance)
 - [Technical Demos & Benchmarks](#technical-demos--benchmarks)
+- [Installation](#installation)
 - [API Reference](#api-reference)
 - [Documentation](#documentation)
 - [Platform Support](#platform-support)
@@ -103,6 +104,50 @@ Run standalone verification demos:
 | Type | Target / Launcher | Source File | Description |
 | :--- | :--- | :--- | :--- |
 | **Interactive Demo** | [`run-demo.bat`](run-demo.bat) | [`Demo.java`](examples/Demo/src/main/java/fastfileindex/Demo.java) | Real-time native C++ directory scanning and live volume stream |
+
+---
+
+## Installation
+
+### Option 1: Maven (Recommended via JitPack)
+
+Add the JitPack repository and dependency to your `pom.xml`:
+
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>com.github.andrestubbe</groupId>
+        <artifactId>FastFileIndex</artifactId>
+        <version>0.1.2</version>
+    </dependency>
+    <dependency>
+        <groupId>com.github.andrestubbe</groupId>
+        <artifactId>FastCore</artifactId>
+        <version>0.1.0</version>
+    </dependency>
+</dependencies>
+```
+
+### Option 2: Gradle (via JitPack)
+
+```groovy
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.andrestubbe:FastFileIndex:0.1.2'
+    implementation 'com.github.andrestubbe:FastCore:0.1.0'
+}
+```
 
 ---
 
